@@ -4,7 +4,7 @@ int main(int argc, char const *argv[]) {
   Game *game = new Game();
 
   game->initializeWindow("Pong", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                         800, 640);
+                         640, 480);
 
   Uint32 frameBegin, runtimeFrame;
   while (game->running()) {

@@ -12,17 +12,20 @@ void Game::initializeWindow(const char* title, int window_xpos, int window_ypos,
     std::cout << "SDL sub-systems initialized successfully!" << std::endl;
 
     sdlWindow = SDL_CreateWindow(title, window_xpos, window_ypos, width, height,
-                                 SDL_WINDOW_RESIZABLE);
+                                 SDL_WINDOW_SHOWN);
     if (sdlWindow != 0) {
       std::cout << "Window Created!" << std::endl;
 
-      sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, 0);
+      sdlRenderer = SDL_CreateRenderer(
+          sdlWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
       if (sdlRenderer != 0) {
         std::cout << "Renderer Created!" << std::endl;
         this->_isRunning = true;
 
         // Set initial Window Background to BLACK
         SDL_SetRenderDrawColor(sdlRenderer, 0, 0, 0, 255);
+
+        SDL_ShowCursor(0);
       } else {
         std::cerr << "SDL Renderer pooped itself" << std::endl;
         std::cerr << SDL_GetError() << std::endl;
