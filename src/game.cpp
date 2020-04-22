@@ -51,6 +51,19 @@ void Game::initializeGame() {
   this->_paddle_sound = Mix_LoadWAV("assets/audio/paddle_hit.wav");
   this->_wall_sound = Mix_LoadWAV("assets/audio/wall_hit.wav");
   this->_score_sound = Mix_LoadWAV("assets/audio/score_update.wav");
+  std::cout << "Audio Loaded!" << std::endl;
+
+  // Initialise Fonts
+  if (TTF_Init() != -1) {
+    std::cout << "TTF Loaded!" << std::endl;
+    this->_font_color = {255, 255, 255, 255};
+    // this->_text_on_launch; -> Do this
+  } else {
+    std::cerr << "TTF pooped itself!" << std::endl;
+    std::cout << TTF_GetError() << std::endl;
+
+    exit(EXIT_FAILURE);
+  }
 }
 
 void Game::handleEvents() {

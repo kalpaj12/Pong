@@ -13,6 +13,11 @@ class Game {
   Mix_Chunk* _wall_sound;
   Mix_Chunk* _score_sound;
 
+  // In-Game Fonts
+  std::string _font_location = "assets/NES-Chimera/NES-Chimera.ttf";
+  SDL_Color _font_color;
+  SDL_Texture* _text_on_launch;
+
   bool _isRunning;
 
  public:
