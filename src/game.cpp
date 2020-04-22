@@ -4,8 +4,8 @@ SDL_Renderer* Game::sdlRenderer = nullptr;
 
 Game::Game() { std::cout << "Game Loading" << std::endl; }
 
-void Game::initializeWindow(const char* title, int window_xpos, int window_ypos,
-                            int width, int height) {
+void Game::initializeGameWindow(const char* title, int window_xpos,
+                                int window_ypos, int width, int height) {
   this->_isRunning = false;
 
   if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
@@ -16,16 +16,14 @@ void Game::initializeWindow(const char* title, int window_xpos, int window_ypos,
     if (sdlWindow != 0) {
       std::cout << "Window Created!" << std::endl;
 
+      // Don't show cursor inside game window
+      SDL_ShowCursor(0);
+
       sdlRenderer = SDL_CreateRenderer(
           sdlWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
       if (sdlRenderer != 0) {
         std::cout << "Renderer Created!" << std::endl;
         this->_isRunning = true;
-
-        // Set initial Window Background to BLACK
-        SDL_SetRenderDrawColor(sdlRenderer, 0, 0, 0, 255);
-
-        SDL_ShowCursor(0);
       } else {
         std::cerr << "SDL Renderer pooped itself" << std::endl;
         std::cerr << SDL_GetError() << std::endl;
@@ -44,6 +42,15 @@ void Game::initializeWindow(const char* title, int window_xpos, int window_ypos,
 
     exit(EXIT_FAILURE);
   }
+}
+
+void Game::initializeGame() {
+  // Initialise sound system
+  Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024);
+
+  this->_paddle_sound = Mix_LoadWAV("assets/audio/paddle_hit.wav");
+  this->_wall_sound = Mix_LoadWAV("assets/audio/wall_hit.wav");
+  this->_score_sound = Mix_LoadWAV("assets/audio/score_update.wav");
 }
 
 void Game::handleEvents() {

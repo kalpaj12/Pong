@@ -1,10 +1,11 @@
 #include "game.hpp"
 
-int main(int argc, char const *argv[]) {
+int main(void) {
   Game *game = new Game();
 
-  game->initializeWindow("Pong", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                         640, 480);
+  game->initializeGameWindow("Pong", SDL_WINDOWPOS_CENTERED,
+                             SDL_WINDOWPOS_CENTERED, 640, 480);
+  game->initializeGame();
 
   Uint32 frameBegin, runtimeFrame;
   while (game->running()) {
