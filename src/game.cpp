@@ -20,8 +20,7 @@ void Game::initializeGameWindow(const char* title, int window_xpos,
       // Don't show cursor inside game window
       SDL_ShowCursor(0);
 
-      sdlRenderer = SDL_CreateRenderer(
-          sdlWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+      sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
       if (sdlRenderer != 0) {
         std::cout << "Renderer Created!" << std::endl;
         this->_isRunning = true;
@@ -60,7 +59,8 @@ void Game::initializeGame() {
     std::cout << "TTF Loaded!" << std::endl;
     this->_font_color = {255, 255, 255, 255};
     this->_text_on_launch =
-        renderText("Press SPACE to start", this->_font_color, 16, sdlRenderer);
+        renderText("Press SPACE to start", this->_font_color, this->_font_size,
+                   sdlRenderer);
 
     // Set initial scores to 0 : 0
     this->_left_score = 0;
@@ -70,12 +70,12 @@ void Game::initializeGame() {
     this->_left_score_changed = true;
     this->_right_score_changed = true;
 
+    // Create Ball
+    this->_ball = new Ball(Game::SCREEN_WIDTH / 2, Game::SCREEN_HEIGHT / 2);
+
     // All loaded successfully, play init sound
     // Yes, it is of SuperMario Bros.
     Mix_PlayChannel(-1, this->_init_sound, 0);
-
-    this->_ball = new Ball(Game::SCREEN_WIDTH / 2, Game::SCREEN_HEIGHT / 2);
-
   } else {
     std::cerr << "TTF pooped itself!" << std::endl;
     std::cout << TTF_GetError() << std::endl;
@@ -105,8 +105,8 @@ void Game::handleEvents() {
             this->_isRunning = false;
             break;
 
-            // // Pressing space will launch the ball if it isn't
-            // // already launched.
+            //  @TODO: Pressing space will launch the ball if it isn't
+            //  already launched.
             // case SDLK_SPACE:
             //   if (ball->status == ball->READY) {
             //     ball->status = ball->LAUNCH;
@@ -127,7 +127,14 @@ void Game::handleEvents() {
 void Game::update() {}
 
 void Game::render() {
+  SDL_SetRenderDrawColor(sdlRenderer, 0, 0, 0, 255);
+
   SDL_RenderClear(sdlRenderer);
+
+  // @TODO: Render _text_on_launch only when game has begun
+  renderTexture(this->_text_on_launch, sdlRenderer,
+                Game::SCREEN_WIDTH / 2 - 160, Game::SCREEN_HEIGHT / 2);
+
   SDL_RenderPresent(sdlRenderer);
 }
 
@@ -164,4 +171,24 @@ SDL_Texture* Game::renderText(const std::string& message, SDL_Color color,
   SDL_FreeSurface(surf);
   TTF_CloseFont(font);
   return texture;
+}
+
+void Game::renderTexture(SDL_Texture* tex, SDL_Renderer* ren, int x, int y,
+                         SDL_Rect* clip) {
+  SDL_Rect dst;
+  dst.x = x;
+  dst.y = y;
+  if (clip != nullptr) {
+    dst.w = clip->w;
+    dst.h = clip->h;
+  } else {
+    SDL_QueryTexture(tex, nullptr, nullptr, &dst.w, &dst.h);
+  }
+
+  renderTexture(tex, ren, dst, clip);
+}
+
+void Game::renderTexture(SDL_Texture* tex, SDL_Renderer* ren, SDL_Rect dst,
+                         SDL_Rect* clip) {
+  SDL_RenderCopy(ren, tex, clip, &dst);
 }

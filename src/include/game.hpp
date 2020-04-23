@@ -22,6 +22,7 @@ class Game {
   // In-Game Fonts
   std::string _font_location = "../assets/NES-Chimera/NES-Chimera.ttf";
   SDL_Color _font_color;
+  const int _font_size = 16;
   SDL_Texture* _text_on_launch;
 
   // Scores.
@@ -72,4 +73,10 @@ class Game {
   // Renderer related methods
   SDL_Texture* renderText(const std::string& message, SDL_Color color,
                           int fontSize, SDL_Renderer* renderer);
+
+  void renderTexture(SDL_Texture* tex, SDL_Renderer* ren, int x, int y,
+                     SDL_Rect* clip = nullptr);
+
+  void renderTexture(SDL_Texture* tex, SDL_Renderer* ren, SDL_Rect dst,
+                     SDL_Rect* clip = nullptr);
 };
