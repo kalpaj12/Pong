@@ -49,6 +49,7 @@ void Game::initializeGame() {
   // Initialise sound system
   Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024);
 
+  this->_init_sound = Mix_LoadWAV("../assets/audio/init.wav");
   this->_paddle_sound = Mix_LoadWAV("../assets/audio/paddle_hit.wav");
   this->_wall_sound = Mix_LoadWAV("../assets/audio/wall_hit.wav");
   this->_score_sound = Mix_LoadWAV("../assets/audio/score_update.wav");
@@ -60,6 +61,19 @@ void Game::initializeGame() {
     this->_font_color = {255, 255, 255, 255};
     this->_text_on_launch =
         renderText("Press SPACE to start", this->_font_color, 16, sdlRenderer);
+
+    // Set initial scores to 0 : 0
+    this->_left_score = 0;
+    this->_right_score = 0;
+
+    // Render it
+    this->_left_score_changed = true;
+    this->_right_score_changed = true;
+
+    // All loaded successfully, play init sound
+    // Yes, it is of SuperMario Bros.
+    Mix_PlayChannel(-1, this->_init_sound, 0);
+
   } else {
     std::cerr << "TTF pooped itself!" << std::endl;
     std::cout << TTF_GetError() << std::endl;
@@ -91,8 +105,20 @@ void Game::render() {
 }
 
 void Game::clean() {
-  SDL_DestroyWindow(sdlWindow);
+  // Free Textures
+  SDL_DestroyTexture(this->_text_on_launch);
+
+  // Free sound effects.
+  Mix_FreeChunk(this->_paddle_sound);
+  Mix_FreeChunk(this->_wall_sound);
+  Mix_FreeChunk(this->_score_sound);
+
+  // Quit SDL_mixer.
+  Mix_CloseAudio();
+
   SDL_DestroyRenderer(sdlRenderer);
+  SDL_DestroyWindow(sdlWindow);
+
   SDL_Quit();
 
   std::cout << "Cleaned" << std::endl;

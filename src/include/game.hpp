@@ -10,6 +10,7 @@
 class Game {
  private:
   //  Sounds
+  Mix_Chunk* _init_sound;
   Mix_Chunk* _paddle_sound;
   Mix_Chunk* _wall_sound;
   Mix_Chunk* _score_sound;
@@ -19,6 +20,14 @@ class Game {
   SDL_Color _font_color;
   SDL_Texture* _text_on_launch;
 
+  // Scores.
+  int _left_score;
+  int _right_score;
+
+  bool _left_score_changed;
+  bool _right_score_changed;
+
+  // Game loop
   bool _isRunning;
 
  public:
