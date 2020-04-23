@@ -5,6 +5,7 @@
 #include <SDL2/SDL_ttf.h>    // SDL font library.
 
 #include <iostream>
+#include <string>
 
 class Game {
  private:
@@ -14,7 +15,7 @@ class Game {
   Mix_Chunk* _score_sound;
 
   // In-Game Fonts
-  std::string _font_location = "assets/NES-Chimera/NES-Chimera.ttf";
+  std::string _font_location = "../assets/NES-Chimera/NES-Chimera.ttf";
   SDL_Color _font_color;
   SDL_Texture* _text_on_launch;
 
@@ -27,6 +28,7 @@ class Game {
   const int FPS = 60;
   const int frameDelay = 1000 / FPS;
 
+  // Game realted methods
   Game();
 
   // Destructor is virtual as won't be using it
@@ -43,4 +45,8 @@ class Game {
   void clean();
 
   bool running() { return this->_isRunning; }
+
+  // Renderer related methods
+  SDL_Texture* renderText(const std::string& message, SDL_Color color,
+                          int fontSize, SDL_Renderer* renderer);
 };

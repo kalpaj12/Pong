@@ -2,6 +2,7 @@
 
 SDL_Renderer* Game::sdlRenderer = nullptr;
 
+// Game Related Methods:
 Game::Game() { std::cout << "Game Loading" << std::endl; }
 
 void Game::initializeGameWindow(const char* title, int window_xpos,
@@ -48,16 +49,17 @@ void Game::initializeGame() {
   // Initialise sound system
   Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024);
 
-  this->_paddle_sound = Mix_LoadWAV("assets/audio/paddle_hit.wav");
-  this->_wall_sound = Mix_LoadWAV("assets/audio/wall_hit.wav");
-  this->_score_sound = Mix_LoadWAV("assets/audio/score_update.wav");
+  this->_paddle_sound = Mix_LoadWAV("../assets/audio/paddle_hit.wav");
+  this->_wall_sound = Mix_LoadWAV("../assets/audio/wall_hit.wav");
+  this->_score_sound = Mix_LoadWAV("../assets/audio/score_update.wav");
   std::cout << "Audio Loaded!" << std::endl;
 
   // Initialise Fonts
   if (TTF_Init() != -1) {
     std::cout << "TTF Loaded!" << std::endl;
     this->_font_color = {255, 255, 255, 255};
-    // this->_text_on_launch; -> Do this
+    this->_text_on_launch =
+        renderText("Press SPACE to start", this->_font_color, 16, sdlRenderer);
   } else {
     std::cerr << "TTF pooped itself!" << std::endl;
     std::cout << TTF_GetError() << std::endl;
@@ -94,4 +96,18 @@ void Game::clean() {
   SDL_Quit();
 
   std::cout << "Cleaned" << std::endl;
+}
+
+// Renderer Related Methods:
+SDL_Texture* Game::renderText(const std::string& message, SDL_Color color,
+                              int fontSize, SDL_Renderer* renderer) {
+  TTF_Font* font = TTF_OpenFont(this->_font_location.c_str(), fontSize);
+
+  SDL_Surface* surf = TTF_RenderText_Blended(font, message.c_str(), color);
+
+  SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surf);
+
+  SDL_FreeSurface(surf);
+  TTF_CloseFont(font);
+  return texture;
 }
