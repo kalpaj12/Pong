@@ -75,6 +75,9 @@ class Game {
 
   bool running() { return this->_isRunning; }
 
+  enum Status { START, INPLAY, COMPLETE };
+  Status status;
+
   // Renderer related methods
   SDL_Texture* renderText(const std::string& message, SDL_Color color,
                           int fontSize, SDL_Renderer* renderer);

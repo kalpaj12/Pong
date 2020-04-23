@@ -76,6 +76,8 @@ void Game::initializeGame() {
     this->_ball =
         new Ball((Game::SCREEN_WIDTH / 2) - 10, (Game::SCREEN_HEIGHT / 2) - 20);
 
+    status = Game::START;
+
     // All loaded successfully, play init sound
     // Yes, it is of SuperMario Bros.
     Mix_PlayChannel(-1, this->_init_sound, 0);
@@ -108,13 +110,12 @@ void Game::handleEvents() {
             this->_isRunning = false;
             break;
 
-            //  @TODO: Pressing space will launch the ball if it isn't
-            //  already launched.
-            // case SDLK_SPACE:
-            //   if (ball->status == ball->READY) {
-            //     ball->status = ball->LAUNCH;
-            //   }
-            //   break;
+          case SDLK_SPACE:
+            if (status == Game::START) {
+              Mix_HaltChannel(-1);
+              status = Game::INPLAY;
+            }
+            break;
 
           default:
             break;
@@ -134,32 +135,32 @@ void Game::render() {
   SDL_RenderClear(sdlRenderer);
   SDL_SetRenderDrawColor(sdlRenderer, 255, 255, 255, 255);
 
-  // @TODO: Render _text_launch only when game has begun
-  renderTexture(this->_text_launch, sdlRenderer, Game::SCREEN_WIDTH / 2 - 160,
-                Game::SCREEN_HEIGHT / 2);
+  if (status == Game::START) {
+    renderTexture(this->_text_launch, sdlRenderer, Game::SCREEN_WIDTH / 2 - 160,
+                  Game::SCREEN_HEIGHT / 2);
+  } else {
+    // Render Ball
+    SDL_Rect ball_rect = {this->_ball->x_pos, this->_ball->y_pos,
+                          this->_ball->DIMENSION, this->_ball->DIMENSION};
+    SDL_RenderFillRect(sdlRenderer, &ball_rect);
 
-  // Render Ball
-  SDL_Rect ball_rect = {this->_ball->x_pos, this->_ball->y_pos,
-                        this->_ball->DIMENSION, this->_ball->DIMENSION};
-  // SDL_RenderFillRect(sdlRenderer, &ball_rect);
+    if (this->_left_score_changed) {
+      this->_text_left_score = renderText(std::to_string(this->_left_score),
+                                          this->_font_color, 24, sdlRenderer);
+      this->_left_score_changed = false;
+    }
+    renderTexture(this->_text_left_score, sdlRenderer,
+                  Game::SCREEN_WIDTH * 3 / 10 - this->_font_size,
+                  Game::SCREEN_HEIGHT / 12);
 
-  if (this->_left_score_changed) {
-    this->_text_left_score = renderText(std::to_string(this->_left_score),
-                                        this->_font_color, 24, sdlRenderer);
-    this->_left_score_changed = false;
+    if (this->_right_score_changed) {
+      this->_text_right_score = renderText(std::to_string(this->_right_score),
+                                           this->_font_color, 24, sdlRenderer);
+      this->_right_score_changed = false;
+    }
+    renderTexture(this->_text_right_score, sdlRenderer,
+                  Game::SCREEN_WIDTH * 7 / 10, Game::SCREEN_HEIGHT / 12);
   }
-  renderTexture(this->_text_left_score, sdlRenderer,
-                Game::SCREEN_WIDTH * 3 / 10 - this->_font_size,
-                Game::SCREEN_HEIGHT / 12);
-
-  if (this->_right_score_changed) {
-    this->_text_right_score = renderText(std::to_string(this->_right_score),
-                                         this->_font_color, 24, sdlRenderer);
-    this->_right_score_changed = false;
-  }
-  renderTexture(this->_text_right_score, sdlRenderer,
-                Game::SCREEN_WIDTH * 7 / 10, Game::SCREEN_HEIGHT / 12);
-
   SDL_RenderPresent(sdlRenderer);
 }
 
