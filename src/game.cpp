@@ -74,6 +74,8 @@ void Game::initializeGame() {
     // Yes, it is of SuperMario Bros.
     Mix_PlayChannel(-1, this->_init_sound, 0);
 
+    this->_ball = new Ball(Game::SCREEN_WIDTH / 2, Game::SCREEN_HEIGHT / 2);
+
   } else {
     std::cerr << "TTF pooped itself!" << std::endl;
     std::cout << TTF_GetError() << std::endl;
@@ -84,16 +86,41 @@ void Game::initializeGame() {
 
 void Game::handleEvents() {
   SDL_Event event;
-  SDL_PollEvent(&event);
+  while (SDL_PollEvent(&event)) {
+    switch (event.type) {
+      case SDL_MOUSEMOTION:
+        SDL_GetMouseState(&this->_mouse_x, &this->_mouse_y);
+        std::cout << "Mouse Co-ordinates: (" << this->_mouse_x << ", "
+                  << this->_mouse_y << ")" << std::endl;
+        break;
 
-  switch (event.type) {
-    case SDL_QUIT:
-      // User has clicked the close button
-      this->_isRunning = false;
-      break;
+      case SDL_QUIT:
+        // User has clicked the close button
+        this->_isRunning = false;
+        break;
 
-    default:
-      break;
+      case SDL_KEYDOWN:
+        switch (event.key.keysym.sym) {
+          case SDLK_ESCAPE:
+            this->_isRunning = false;
+            break;
+
+            // // Pressing space will launch the ball if it isn't
+            // // already launched.
+            // case SDLK_SPACE:
+            //   if (ball->status == ball->READY) {
+            //     ball->status = ball->LAUNCH;
+            //   }
+            //   break;
+
+          default:
+            break;
+        }
+        break;
+
+      default:
+        break;
+    }
   }
 }
 

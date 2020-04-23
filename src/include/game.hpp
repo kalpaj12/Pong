@@ -7,6 +7,10 @@
 #include <iostream>
 #include <string>
 
+#include "ball.hpp"
+
+class Ball;
+
 class Game {
  private:
   //  Sounds
@@ -26,6 +30,13 @@ class Game {
 
   bool _left_score_changed;
   bool _right_score_changed;
+
+  // Controller
+  int _mouse_x;
+  int _mouse_y;
+
+  // Game Objects
+  Ball* _ball;
 
   // Game loop
   bool _isRunning;
