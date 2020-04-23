@@ -4,7 +4,8 @@ int main(void) {
   Game *game = new Game();
 
   game->initializeGameWindow("Pong", SDL_WINDOWPOS_CENTERED,
-                             SDL_WINDOWPOS_CENTERED, 640, 480);
+                             SDL_WINDOWPOS_CENTERED, game->SCREEN_WIDTH,
+                             game->SCREEN_HEIGHT);
   game->initializeGame();
 
   Uint32 frameBegin, runtimeFrame;

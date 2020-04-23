@@ -34,6 +34,9 @@ class Game {
   static SDL_Renderer* sdlRenderer;
   SDL_Window* sdlWindow;
 
+  static const int SCREEN_WIDTH = 640;
+  static const int SCREEN_HEIGHT = 480;
+
   const int FPS = 60;
   const int frameDelay = 1000 / FPS;
 

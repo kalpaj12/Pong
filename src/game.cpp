@@ -109,6 +109,7 @@ void Game::clean() {
   SDL_DestroyTexture(this->_text_on_launch);
 
   // Free sound effects.
+  Mix_FreeChunk(this->_init_sound);
   Mix_FreeChunk(this->_paddle_sound);
   Mix_FreeChunk(this->_wall_sound);
   Mix_FreeChunk(this->_score_sound);
