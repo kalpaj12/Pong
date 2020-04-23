@@ -8,8 +8,10 @@
 #include <string>
 
 #include "ball.hpp"
+#include "paddle.hpp"
 
 class Ball;
+class Paddle;
 
 class Game {
  private:
@@ -43,6 +45,8 @@ class Game {
 
   // Game Objects
   Ball* _ball;
+  Paddle* _left_paddle;
+  Paddle* _right_paddle;
 
   // Game loop
   bool _isRunning;

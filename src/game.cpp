@@ -76,6 +76,14 @@ void Game::initializeGame() {
     this->_ball =
         new Ball((Game::SCREEN_WIDTH / 2) - 10, (Game::SCREEN_HEIGHT / 2) - 20);
 
+    // Create left & right paddles
+    this->_left_paddle =
+        new Paddle(40, Game::SCREEN_HEIGHT / 2 - Paddle::HEIGHT / 2);
+
+    this->_right_paddle =
+        new Paddle(Game::SCREEN_WIDTH - (40 + Paddle::WIDTH),
+                   Game::SCREEN_HEIGHT / 2 - Paddle::HEIGHT / 2);
+
     status = Game::START;
 
     // All loaded successfully, play init sound
@@ -128,7 +136,20 @@ void Game::handleEvents() {
   }
 }
 
-void Game::update() {}
+void Game::update() {
+  this->_right_paddle->set_y(this->_mouse_y);
+
+  // @TODO: Add AI here
+  this->_left_paddle->set_y(this->_mouse_y);
+
+  if (Game::status == Game::START) {
+    return;
+  }
+
+  if (Game::status == Game::INPLAY) {
+    // @TODO: Ball movements
+  }
+}
 
 void Game::render() {
   SDL_SetRenderDrawColor(sdlRenderer, 0, 0, 0, 255);
@@ -138,12 +159,24 @@ void Game::render() {
   if (status == Game::START) {
     renderTexture(this->_text_launch, sdlRenderer, Game::SCREEN_WIDTH / 2 - 160,
                   Game::SCREEN_HEIGHT / 2);
-  } else {
+  } else if (status == Game::INPLAY) {
+    // Render Paddles
+    SDL_Rect left_paddle = {this->_left_paddle->x_pos,
+                            this->_left_paddle->y_pos, Paddle::WIDTH,
+                            Paddle::HEIGHT};
+    SDL_RenderFillRect(sdlRenderer, &left_paddle);
+
+    SDL_Rect right_paddle = {this->_right_paddle->x_pos,
+                             this->_right_paddle->y_pos, Paddle::WIDTH,
+                             Paddle::HEIGHT};
+    SDL_RenderFillRect(sdlRenderer, &right_paddle);
+
     // Render Ball
     SDL_Rect ball_rect = {this->_ball->x_pos, this->_ball->y_pos,
                           this->_ball->DIMENSION, this->_ball->DIMENSION};
     SDL_RenderFillRect(sdlRenderer, &ball_rect);
 
+    // Render Score
     if (this->_left_score_changed) {
       this->_text_left_score = renderText(std::to_string(this->_left_score),
                                           this->_font_color, 24, sdlRenderer);
