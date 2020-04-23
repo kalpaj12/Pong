@@ -103,8 +103,8 @@ void Game::handleEvents() {
     switch (event.type) {
       case SDL_MOUSEMOTION:
         SDL_GetMouseState(&this->_mouse_x, &this->_mouse_y);
-        std::cout << "Mouse Co-ordinates: (" << this->_mouse_x << ", "
-                  << this->_mouse_y << ")" << std::endl;
+        // std::cout << "Mouse Co-ordinates: (" << this->_mouse_x << ", "
+        //           << this->_mouse_y << ")" << std::endl;
         break;
 
       case SDL_QUIT:
@@ -137,17 +137,33 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
-  this->_right_paddle->set_y(this->_mouse_y);
-
-  // @TODO: Add AI here
-  this->_left_paddle->set_y(this->_mouse_y);
-
   if (Game::status == Game::START) {
     return;
   }
 
   if (Game::status == Game::INPLAY) {
-    // @TODO: Ball movements
+    this->_right_paddle->set_y(this->_mouse_y);
+
+    // @TODO: Add AI here
+    this->_left_paddle->set_y(this->_mouse_y);
+
+    this->_ball->update_speed();
+
+    this->_ball->x_pos += this->_ball->dx;
+    this->_ball->y_pos += this->_ball->dy;
+
+    // Ball goes out.
+    if (this->_ball->x_pos > Game::SCREEN_WIDTH) {
+      this->_left_score++;
+      this->_left_score_changed = true;
+      Mix_PlayChannel(-1, this->_score_sound, 0);
+      this->_ball->reset();
+    } else if (this->_ball->x_pos <= 0) {
+      this->_right_score++;
+      this->_right_score_changed = true;
+      Mix_PlayChannel(-1, this->_score_sound, 0);
+      this->_ball->reset();
+    }
   }
 }
 
