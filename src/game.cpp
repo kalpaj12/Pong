@@ -282,6 +282,7 @@ void Game::clean() {
   SDL_DestroyTexture(this->_text_launch);
   SDL_DestroyTexture(this->_text_left_score);
   SDL_DestroyTexture(this->_text_right_score);
+  SDL_DestroyTexture(this->_text_paused);
   SDL_DestroyTexture(this->_text_winner);
   SDL_DestroyTexture(this->_text_restart);
 
@@ -290,6 +291,7 @@ void Game::clean() {
   Mix_FreeChunk(this->_paddle_sound);
   Mix_FreeChunk(this->_wall_sound);
   Mix_FreeChunk(this->_score_sound);
+  Mix_FreeChunk(this->_pause_sound);
 
   // Quit SDL_mixer.
   Mix_CloseAudio();
