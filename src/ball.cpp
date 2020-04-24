@@ -23,14 +23,14 @@ bool Ball::latitude_wall_collision() {
 
 bool Ball::paddle_collision(Paddle *paddle) {
   if (paddle->x_pos > Game::SCREEN_WIDTH / 2) {
-    if (this->x_pos + this->dx >= paddle->x_pos &&
+    if (this->x_pos + this->dx + this->DIMENSION >= paddle->x_pos &&
         this->y_pos + this->dy >= paddle->y_pos &&
         this->y_pos + this->dy <= paddle->y_pos + Paddle::HEIGHT)
       return true;
     else
       return false;
   } else {
-    if (this->x_pos + this->dx <= paddle->x_pos &&
+    if (this->x_pos + this->dx <= paddle->x_pos + Paddle::WIDTH &&
         this->y_pos + this->dy >= paddle->y_pos &&
         this->y_pos + this->dy <= paddle->y_pos + Paddle::HEIGHT)
       return true;

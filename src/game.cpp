@@ -18,7 +18,7 @@ void Game::initializeGameWindow(const char* title, int window_xpos,
       std::cout << "Window Created!" << std::endl;
 
       // Don't show cursor inside game window
-      SDL_ShowCursor(0);
+      // SDL_ShowCursor(0);
 
       sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
       if (sdlRenderer != 0) {
