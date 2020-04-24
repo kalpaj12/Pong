@@ -18,7 +18,7 @@ void Game::initializeGameWindow(const char* title, int window_xpos,
       std::cout << "Window Created!" << std::endl;
 
       // Don't show cursor inside game window
-      // SDL_ShowCursor(0);
+      SDL_ShowCursor(0);
 
       sdlRenderer = SDL_CreateRenderer(sdlWindow, -1, SDL_RENDERER_ACCELERATED);
       if (sdlRenderer != 0) {
@@ -184,38 +184,41 @@ void Game::update() {
     this->_left_paddle->set_y(this->_mouse_y);
 
     // Update ball pos
+    this->_ball->bounced = false;
     this->_ball->x_pos += this->_ball->dx;
     this->_ball->y_pos += this->_ball->dy;
 
+    // Ball collides to upper walls
+    if (this->_ball->latitude_wall_collision()) {
+      this->_ball->dy *= (-1);
+      Mix_PlayChannel(-1, this->_wall_sound, 0);
+    }
+
+    // Ball collides with paddles
+    if (this->_ball->paddle_collision(this->_right_paddle)) {
+      Mix_PlayChannel(-1, this->_paddle_sound, 0);
+      this->_ball->dx *= -1;
+    } else if (this->_ball->paddle_collision(this->_left_paddle)) {
+      this->_ball->dx *= -1;
+      Mix_PlayChannel(-1, this->_paddle_sound, 0);
+    }
+
     // Ball goes out from paddle side
-    if (this->_ball->x_pos >
-        this->_right_paddle->x_pos + this->_right_paddle->WIDTH) {
+    if (this->_ball->x_pos + this->_ball->DIMENSION >
+            this->_right_paddle->x_pos &&
+        !this->_ball->bounced) {
       this->_left_score++;
       this->_left_score_changed = true;
       Mix_PlayChannel(-1, this->_score_sound, 0);
       this->_ball->reset();
     } else if (this->_ball->x_pos <
-               this->_left_paddle->x_pos - this->_left_paddle->WIDTH) {
+                   this->_left_paddle->x_pos + this->_left_paddle->WIDTH &&
+               !this->_ball->bounced) {
       this->_right_score++;
       this->_right_score_changed = true;
       Mix_PlayChannel(-1, this->_score_sound, 0);
       this->_ball->reset();
     }
-  }
-
-  // Ball collides to upper walls
-  if (this->_ball->latitude_wall_collision()) {
-    this->_ball->dy *= (-1);
-    Mix_PlayChannel(-1, this->_wall_sound, 0);
-  }
-
-  // Ball collides with paddles
-  if (this->_ball->paddle_collision(this->_right_paddle)) {
-    Mix_PlayChannel(-1, this->_paddle_sound, 0);
-    this->_ball->dx *= -1;
-  } else if (this->_ball->paddle_collision(this->_left_paddle)) {
-    this->_ball->dx *= -1;
-    Mix_PlayChannel(-1, this->_paddle_sound, 0);
   }
 
   if (this->_right_score == 5) {

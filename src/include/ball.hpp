@@ -17,6 +17,7 @@ class Ball {
   int dx;
   int dy;
 
+  bool bounced;
   double angle;
 
   void init_ball_push();
