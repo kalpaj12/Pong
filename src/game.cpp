@@ -165,7 +165,12 @@ void Game::update() {
     this->_ball->x_pos += this->_ball->dx;
     this->_ball->y_pos += this->_ball->dy;
 
-    // Ball goes out.
+    if (this->_ball->latitude_wall_collision()) {
+      this->_ball->dy *= (-1);
+      Mix_PlayChannel(-1, this->_wall_sound, 0);
+    }
+
+    // Ball goes out from paddle side
     if (this->_ball->x_pos > Game::SCREEN_WIDTH) {
       this->_left_score++;
       this->_left_score_changed = true;

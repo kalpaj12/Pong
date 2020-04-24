@@ -16,6 +16,12 @@ Ball::Ball(int pos_x, int pos_y) {
   hits = 0;
 }
 
+bool Ball::latitude_wall_collision() {
+  if (this->y_pos + this->DIMENSION >= Game::SCREEN_HEIGHT || this->y_pos <= 0)
+    return true;
+  return false;
+}
+
 void Ball::update_speed() {
   if (hits == 3) {
     speed += 2;
