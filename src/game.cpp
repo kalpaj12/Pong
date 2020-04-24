@@ -45,56 +45,59 @@ void Game::initializeGameWindow(const char* title, int window_xpos,
 }
 
 void Game::initializeGame() {
-  // Initialise sound system
-  Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024);
+  if (Game::status != Game::INPLAY) {
+    // Initialise sound system
+    Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024);
 
-  this->_init_sound = Mix_LoadWAV("../assets/audio/init.wav");
-  this->_paddle_sound = Mix_LoadWAV("../assets/audio/paddle_hit.wav");
-  this->_wall_sound = Mix_LoadWAV("../assets/audio/wall_hit.wav");
-  this->_score_sound = Mix_LoadWAV("../assets/audio/score_update.wav");
-  std::cout << "Audio Loaded!" << std::endl;
+    this->_init_sound = Mix_LoadWAV("../assets/audio/init.wav");
+    this->_paddle_sound = Mix_LoadWAV("../assets/audio/paddle_hit.wav");
+    this->_wall_sound = Mix_LoadWAV("../assets/audio/wall_hit.wav");
+    this->_score_sound = Mix_LoadWAV("../assets/audio/score_update.wav");
+    std::cout << "Audio Loaded!" << std::endl;
 
-  // Initialise Fonts
-  if (TTF_Init() != -1) {
-    std::cout << "TTF Loaded!" << std::endl;
-    this->_font_color = {255, 255, 255, 255};
-    this->_text_launch = renderText("Press SPACE to start", this->_font_color,
-                                    this->_font_size, sdlRenderer);
-    this->_text_restart =
-        renderText("Press SPACE to restart", this->_font_color,
-                   this->_font_size, sdlRenderer);
+    // Initialise Fonts
+    if (TTF_Init() != -1) {
+      std::cout << "TTF Loaded!" << std::endl;
+      this->_font_color = {255, 255, 255, 255};
+      this->_text_launch = renderText("Press SPACE to start", this->_font_color,
+                                      this->_font_size, sdlRenderer);
+      this->_text_restart =
+          renderText("Press SPACE to restart", this->_font_color,
+                     this->_font_size, sdlRenderer);
+    } else {
+      std::cerr << "TTF pooped itself!" << std::endl;
+      std::cout << TTF_GetError() << std::endl;
 
-    // Set initial scores to 0 : 0
-    this->_left_score = 0;
-    this->_right_score = 0;
-
-    // Render it
-    this->_left_score_changed = true;
-    this->_right_score_changed = true;
-
-    // Create Ball
-    this->_ball =
-        new Ball((Game::SCREEN_WIDTH / 2) - 10, (Game::SCREEN_HEIGHT / 2) - 20);
-
-    // Create left & right paddles
-    this->_left_paddle =
-        new Paddle(40, Game::SCREEN_HEIGHT / 2 - Paddle::HEIGHT / 2);
-
-    this->_right_paddle =
-        new Paddle(Game::SCREEN_WIDTH - (40 + Paddle::WIDTH),
-                   Game::SCREEN_HEIGHT / 2 - Paddle::HEIGHT / 2);
-
-    status = Game::START;
+      exit(EXIT_FAILURE);
+    }
+    Game::status = Game::START;
 
     // All loaded successfully, play init sound
     // Yes, it is of SuperMario Bros.
     Mix_PlayChannel(-1, this->_init_sound, 0);
-  } else {
-    std::cerr << "TTF pooped itself!" << std::endl;
-    std::cout << TTF_GetError() << std::endl;
-
-    exit(EXIT_FAILURE);
   }
+
+  if (Game::status == Game::INPLAY) Mix_HaltChannel(-1);
+
+  // Set initial scores to 0 : 0
+  this->_left_score = 0;
+  this->_right_score = 0;
+
+  // Render it
+  this->_left_score_changed = true;
+  this->_right_score_changed = true;
+
+  // Create Ball
+  this->_ball =
+      new Ball((Game::SCREEN_WIDTH / 2) - 10, (Game::SCREEN_HEIGHT / 2) - 20);
+
+  // Create left & right paddles
+  this->_left_paddle =
+      new Paddle(40, Game::SCREEN_HEIGHT / 2 - Paddle::HEIGHT / 2);
+
+  this->_right_paddle =
+      new Paddle(Game::SCREEN_WIDTH - (40 + Paddle::WIDTH),
+                 Game::SCREEN_HEIGHT / 2 - Paddle::HEIGHT / 2);
 }
 
 void Game::handleEvents() {
@@ -102,9 +105,11 @@ void Game::handleEvents() {
   while (SDL_PollEvent(&event)) {
     switch (event.type) {
       case SDL_MOUSEMOTION:
-        SDL_GetMouseState(&this->_mouse_x, &this->_mouse_y);
-        // std::cout << "Mouse Co-ordinates: (" << this->_mouse_x << ", "
-        //           << this->_mouse_y << ")" << std::endl;
+        if (Game::status == Game::INPLAY) {
+          SDL_GetMouseState(&this->_mouse_x, &this->_mouse_y);
+          // std::cout << "Mouse Co-ordinates: (" << this->_mouse_x << ", "
+          //           << this->_mouse_y << ")" << std::endl;
+        }
         break;
 
       case SDL_QUIT:
@@ -119,9 +124,15 @@ void Game::handleEvents() {
             break;
 
           case SDLK_SPACE:
-            if (status == Game::START) {
+            if (Game::status == Game::START) {
               Mix_HaltChannel(-1);
-              status = Game::INPLAY;
+              Game::status = Game::INPLAY;
+            }
+
+            if (Game::status == Game::COMPLETE) {
+              Mix_HaltChannel(-1);
+              Game::status = Game::INPLAY;
+              initializeGame();
             }
             break;
 
@@ -142,11 +153,13 @@ void Game::update() {
   }
 
   if (Game::status == Game::INPLAY) {
+    // Paddles
     this->_right_paddle->set_y(this->_mouse_y);
 
     // @TODO: Add AI here
     this->_left_paddle->set_y(this->_mouse_y);
 
+    // Ball
     this->_ball->update_speed();
 
     this->_ball->x_pos += this->_ball->dx;
@@ -164,6 +177,18 @@ void Game::update() {
       Mix_PlayChannel(-1, this->_score_sound, 0);
       this->_ball->reset();
     }
+  }
+
+  if (this->_right_score == 5) {
+    Game::status = Game::COMPLETE;
+    this->_text_winner = renderText("Player 2 wins!", this->_font_color,
+                                    this->_font_size, sdlRenderer);
+  }
+
+  if (this->_left_score == 5) {
+    Game::status = Game::COMPLETE;
+    this->_text_winner = renderText("Player 1 wins!", this->_font_color,
+                                    this->_font_size, sdlRenderer);
   }
 }
 
@@ -209,6 +234,12 @@ void Game::render() {
     }
     renderTexture(this->_text_right_score, sdlRenderer,
                   Game::SCREEN_WIDTH * 7 / 10, Game::SCREEN_HEIGHT / 12);
+  } else if (Game::status == Game::COMPLETE) {
+    renderTexture(this->_text_winner, sdlRenderer, Game::SCREEN_WIDTH / 2 - 160,
+                  Game::SCREEN_HEIGHT / 2 - 100);
+
+    renderTexture(this->_text_restart, sdlRenderer,
+                  Game::SCREEN_WIDTH / 2 - 180, Game::SCREEN_HEIGHT / 2);
   }
   SDL_RenderPresent(sdlRenderer);
 }
