@@ -53,14 +53,19 @@ void Game::initializeGame() {
     this->_paddle_sound = Mix_LoadWAV("../assets/audio/paddle_hit.wav");
     this->_wall_sound = Mix_LoadWAV("../assets/audio/wall_hit.wav");
     this->_score_sound = Mix_LoadWAV("../assets/audio/score_update.wav");
+    this->_pause_sound = Mix_LoadWAV("../assets/audio/pause.wav");
     std::cout << "Audio Loaded!" << std::endl;
 
     // Initialise Fonts
     if (TTF_Init() != -1) {
       std::cout << "TTF Loaded!" << std::endl;
       this->_font_color = {255, 255, 255, 255};
+
       this->_text_launch = renderText("Press SPACE to start", this->_font_color,
                                       this->_font_size, sdlRenderer);
+      this->_text_paused =
+          renderText("Game Paused, press p to continue", this->_font_color,
+                     this->_font_size, sdlRenderer);
       this->_text_restart =
           renderText("Press SPACE to restart", this->_font_color,
                      this->_font_size, sdlRenderer);
@@ -136,6 +141,22 @@ void Game::handleEvents() {
             }
             break;
 
+          case SDLK_p: {
+            bool is_valid_pause = false;
+            if (Game::status == Game::INPLAY) {
+              Game::status = Game::PAUSE;
+              is_valid_pause = true;
+            } else if (Game::status == Game::PAUSE) {
+              Game::status = Game::INPLAY;
+              is_valid_pause = true;
+            }
+
+            if (is_valid_pause) {
+              Mix_HaltChannel(-1);
+              Mix_PlayChannel(-1, this->_pause_sound, 0);
+            }
+          } break;
+
           default:
             break;
         }
@@ -149,6 +170,10 @@ void Game::handleEvents() {
 
 void Game::update() {
   if (Game::status == Game::START) {
+    return;
+  }
+
+  if (Game::status == Game::PAUSE) {
     return;
   }
 
@@ -239,6 +264,9 @@ void Game::render() {
     }
     renderTexture(this->_text_right_score, sdlRenderer,
                   Game::SCREEN_WIDTH * 7 / 10, Game::SCREEN_HEIGHT / 12);
+  } else if (Game::status == Game::PAUSE) {
+    renderTexture(this->_text_paused, sdlRenderer, Game::SCREEN_WIDTH / 2 - 260,
+                  Game::SCREEN_HEIGHT / 2);
   } else if (Game::status == Game::COMPLETE) {
     renderTexture(this->_text_winner, sdlRenderer, Game::SCREEN_WIDTH / 2 - 160,
                   Game::SCREEN_HEIGHT / 2 - 100);

@@ -20,6 +20,7 @@ class Game {
   Mix_Chunk* _paddle_sound;
   Mix_Chunk* _wall_sound;
   Mix_Chunk* _score_sound;
+  Mix_Chunk* _pause_sound;
 
   // In-Game Fonts
   std::string _font_location = "../assets/NES-Chimera/NES-Chimera.ttf";
@@ -29,6 +30,7 @@ class Game {
   SDL_Texture* _text_launch;
   SDL_Texture* _text_left_score;
   SDL_Texture* _text_right_score;
+  SDL_Texture* _text_paused;
   SDL_Texture* _text_winner;
   SDL_Texture* _text_restart;
 
@@ -79,7 +81,7 @@ class Game {
 
   bool running() { return this->_isRunning; }
 
-  enum Status { START, INPLAY, COMPLETE };
+  enum Status { START, INPLAY, PAUSE, COMPLETE };
   Status status;
 
   // Renderer related methods
