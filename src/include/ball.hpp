@@ -22,6 +22,7 @@ class Ball {
   bool bounced;
 
   bool latitude_wall_collision();
+  void init_ball_push();
   void update_speed();
   void reset();
 };

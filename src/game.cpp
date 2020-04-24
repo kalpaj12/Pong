@@ -95,6 +95,7 @@ void Game::initializeGame() {
   // Create Ball
   this->_ball =
       new Ball((Game::SCREEN_WIDTH / 2) - 10, (Game::SCREEN_HEIGHT / 2) - 20);
+  this->_ball->init_ball_push();
 
   // Create left & right paddles
   this->_left_paddle =
@@ -170,11 +171,9 @@ void Game::handleEvents() {
 
 void Game::update() {
   if (Game::status == Game::START) {
-    return;
   }
 
   if (Game::status == Game::PAUSE) {
-    return;
   }
 
   if (Game::status == Game::INPLAY) {
