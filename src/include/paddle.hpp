@@ -12,6 +12,5 @@ class Paddle {
   virtual ~Paddle() = default;
 
   // As paddle moves only in y-direction
-  void add_to_y(int new_y);
   void set_y(int new_y);
 };

@@ -1,5 +1,8 @@
 #pragma once
 
+#include "paddle.hpp"
+
+class Paddle;
 class Ball {
  public:
   static const int DIMENSION = 10;
@@ -14,15 +17,12 @@ class Ball {
   int dx;
   int dy;
 
-  int speed;
-  int hits;  // to increase speed of the ball
-
   double angle;
 
-  bool bounced;
-
-  bool latitude_wall_collision();
   void init_ball_push();
   void update_speed();
+
+  bool latitude_wall_collision();
+  bool paddle_collision(Paddle *paddle);
   void reset();
 };

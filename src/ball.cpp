@@ -12,15 +12,31 @@ Ball::Ball(int pos_x, int pos_y) {
   dy = 0;
 
   y_predicted = 0;
-  bounced = false;
-  speed = 8;
   angle = 0;
-  hits = 0;
 }
 
 bool Ball::latitude_wall_collision() {
   if (this->y_pos + this->DIMENSION >= Game::SCREEN_HEIGHT || this->y_pos <= 0)
     return true;
+  return false;
+}
+
+bool Ball::paddle_collision(Paddle *paddle) {
+  if (paddle->x_pos > Game::SCREEN_WIDTH / 2) {
+    if (this->x_pos + this->dx >= paddle->x_pos &&
+        this->y_pos + this->dy >= paddle->y_pos &&
+        this->y_pos + this->dy <= paddle->y_pos + Paddle::HEIGHT)
+      return true;
+    else
+      return false;
+  } else {
+    if (this->x_pos + this->dx <= paddle->x_pos &&
+        this->y_pos + this->dy >= paddle->y_pos &&
+        this->y_pos + this->dy <= paddle->y_pos + Paddle::HEIGHT)
+      return true;
+    else
+      return false;
+  }
   return false;
 }
 
@@ -35,15 +51,8 @@ void Ball::init_ball_push() {
   std::uniform_int_distribution<int> iangle(-60, 60);
   this->angle = iangle(rgen);  // -60 to 60 degrees
 
-  this->dx = launch_direction * speed * std::cos(this->angle * M_PI / 180.0);
-  this->dy = launch_direction * speed * std::sin(this->angle * M_PI / 180.0);
-}
-
-void Ball::update_speed() {
-  if (hits == 3) {
-    speed += 2;
-    hits = 0;
-  }
+  this->dx = launch_direction * 8 * std::cos(this->angle * M_PI / 180.0);
+  this->dy = launch_direction * 8 * std::sin(this->angle * M_PI / 180.0);
 }
 
 void Ball::reset() {
@@ -51,8 +60,4 @@ void Ball::reset() {
   y_pos = Game::SCREEN_HEIGHT / 2;
 
   init_ball_push();
-
-  bounced = false;
-  speed = 8;
-  hits = 0;
 }

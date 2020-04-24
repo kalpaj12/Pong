@@ -183,29 +183,39 @@ void Game::update() {
     // @TODO: Add AI here
     this->_left_paddle->set_y(this->_mouse_y);
 
-    // Ball
-    this->_ball->update_speed();
-
+    // Update ball pos
     this->_ball->x_pos += this->_ball->dx;
     this->_ball->y_pos += this->_ball->dy;
 
-    if (this->_ball->latitude_wall_collision()) {
-      this->_ball->dy *= (-1);
-      Mix_PlayChannel(-1, this->_wall_sound, 0);
-    }
-
     // Ball goes out from paddle side
-    if (this->_ball->x_pos > Game::SCREEN_WIDTH) {
+    if (this->_ball->x_pos >
+        this->_right_paddle->x_pos + this->_right_paddle->WIDTH) {
       this->_left_score++;
       this->_left_score_changed = true;
       Mix_PlayChannel(-1, this->_score_sound, 0);
       this->_ball->reset();
-    } else if (this->_ball->x_pos <= 0) {
+    } else if (this->_ball->x_pos <
+               this->_left_paddle->x_pos - this->_left_paddle->WIDTH) {
       this->_right_score++;
       this->_right_score_changed = true;
       Mix_PlayChannel(-1, this->_score_sound, 0);
       this->_ball->reset();
     }
+  }
+
+  // Ball collides to upper walls
+  if (this->_ball->latitude_wall_collision()) {
+    this->_ball->dy *= (-1);
+    Mix_PlayChannel(-1, this->_wall_sound, 0);
+  }
+
+  // Ball collides with paddles
+  if (this->_ball->paddle_collision(this->_right_paddle)) {
+    Mix_PlayChannel(-1, this->_paddle_sound, 0);
+    this->_ball->dx *= -1;
+  } else if (this->_ball->paddle_collision(this->_left_paddle)) {
+    this->_ball->dx *= -1;
+    Mix_PlayChannel(-1, this->_paddle_sound, 0);
   }
 
   if (this->_right_score == 5) {
