@@ -257,6 +257,17 @@ void Game::render() {
     renderTexture(this->_text_launch, sdlRenderer, Game::SCREEN_WIDTH / 2 - 160,
                   Game::SCREEN_HEIGHT / 2);
   } else if (status == Game::INPLAY) {
+    // Left and right gutter
+    SDL_Rect left_line = {this->_left_paddle->x_pos - 1, 0, 1,
+                          Game::SCREEN_HEIGHT};
+    SDL_Rect right_line = {this->_right_paddle->x_pos + Paddle::WIDTH, 0, 1,
+                           Game::SCREEN_HEIGHT};
+
+    SDL_SetRenderDrawColor(sdlRenderer, 255, 0, 0, 255);
+    SDL_RenderFillRect(sdlRenderer, &left_line);
+    SDL_RenderFillRect(sdlRenderer, &right_line);
+    SDL_SetRenderDrawColor(sdlRenderer, 255, 255, 255, 255);
+
     // Render Paddles
     SDL_Rect left_paddle = {this->_left_paddle->x_pos,
                             this->_left_paddle->y_pos, Paddle::WIDTH,
