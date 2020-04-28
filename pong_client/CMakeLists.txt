@@ -11,6 +11,7 @@ find_package(SDL2 REQUIRED)
 find_package(SDL2_mixer REQUIRED)
 find_package(SDL2_image REQUIRED)
 find_package(SDL2_ttf REQUIRED)
+find_package(SDL2_net REQUIRED)
 
 include_directories(src/include)
 file(GLOB SOURCES "src/*.cpp")
@@ -22,4 +23,4 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -Wshadow -Wfatal-errors
 
 add_executable(pong ${SOURCES} main.cpp)
 
-target_link_libraries(pong SDL2::Main SDL2::Mixer SDL2::Image SDL2::TTF)
+target_link_libraries(pong SDL2::Main SDL2::Mixer SDL2::Image SDL2::TTF SDL2::Net)
