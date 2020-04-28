@@ -4,7 +4,7 @@
         "name": "(GDB) Debug",
         "type": "cppdbg",
         "request": "launch",
-        "program": "${workspaceFolder}/build/pong",
+        "program": "${workspaceFolder}/pong_client/build/pong",
         "args": [],
         "stopAtEntry": true,
         "cwd": "${workspaceFolder}",
