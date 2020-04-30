@@ -1,7 +1,7 @@
 {
     "version": "0.2.0",
     "configurations": [{
-        "name": "(GDB) Debug",
+        "name": "Game Debug",
         "type": "cppdbg",
         "request": "launch",
         "program": "${workspaceFolder}/pong_client/build/pong",
@@ -16,5 +16,24 @@
             "text": "-enable-pretty-printing",
             "ignoreFailures": true
         }]
-    }]
+    },
+    {
+        "name": "Server Debug",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/pong_server/build/server",
+        "args": [],
+        "stopAtEntry": true,
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [{
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+        }]
+    }
+
+]
 }
