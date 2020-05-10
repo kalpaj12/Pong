@@ -15,3 +15,15 @@ void Paddle::set_y(int new_y) {
 
   this->y_pos = new_y;
 }
+
+// AI for left paddle(player 1)
+void Paddle::set_ai_y(Ball *ball) {
+  // @TODO: Sometimes mess this code, so that AI looses :)
+  int curr_ball_pos = ball->y_pos;
+
+  this->y_pos =
+      curr_ball_pos + (int)floor((Ball::DIMENSION - Paddle::HEIGHT) / 2);
+  if (this->y_pos < 0) this->y_pos = 0;
+  if (this->y_pos + Paddle::HEIGHT > Game::SCREEN_HEIGHT)
+    this->y_pos = Game::SCREEN_HEIGHT - Paddle::HEIGHT;
+}

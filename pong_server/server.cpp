@@ -1,4 +1,6 @@
 #include <arpa/inet.h>
+#include <fcntl.h>
+#include <net/if.h>
 #include <netinet/in.h>
 #include <pthread.h>
 #include <stdbool.h>
@@ -6,13 +8,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
+#include <sys/types.h>
 #include <time.h>
+#include <unistd.h>
 
 #define MAX_PLAYERS 2
 
-socklen_t addr_size = sizeof(struct sockaddr);
+socklen_t addr_size = sizeof(struct sockaddr_in);
 struct sockaddr_in clients_addresses[MAX_PLAYERS];
 int players[MAX_PLAYERS];
+
+void getLocalIP() {
+  int fd = socket(AF_INET, SOCK_DGRAM, 0);
+  struct ifreq ifr;
+  ifr.ifr_addr.sa_family = AF_INET;
+
+  strncpy(ifr.ifr_name, "wlp2s0", IFNAMSIZ - 1);
+  ioctl(fd, SIOCGIFADDR, &ifr);
+
+  close(fd);
+
+  printf("Server IP: [%s]\n",
+         inet_ntoa(((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr));
+}
 
 void init_players() {
   for (int i = 0; i < MAX_PLAYERS; i++) players[i] = 0;
@@ -30,11 +50,6 @@ void* server_listen_loop(void* arg) {
     // Debug start
     for (int i = 0; i < 4; i++) printf("%d ", rdata[i]);
     printf("\n");
-
-    char client_ip[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &client_addr.sin_addr, client_ip, INET_ADDRSTRLEN);
-
-    printf("Client IP: [%s]\n", client_ip);
     // Debug end
 
     // requst to join server
@@ -58,7 +73,8 @@ void* server_listen_loop(void* arg) {
 // }
 
 int main(void) {
-  printf("Server Init!\n");
+  printf("Server Init Successful!\n");
+  getLocalIP();
 
   init_players();
 
@@ -72,15 +88,18 @@ int main(void) {
   server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
   server_addr.sin_port = htons(PORT);
 
-  int sock_server;
-
   memset(clients_addresses, 0, sizeof(struct sockaddr_in) * MAX_PLAYERS);
-  if ((sock_server = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
+
+  // Create a UDP socket
+  int sock_server;
+  if ((sock_server = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
     perror("socket failed");
+    exit(EXIT_FAILURE);
   }
   if (bind(sock_server, (struct sockaddr*)&server_addr,
            sizeof(struct sockaddr)) < 0) {
     perror("bind server error");
+    exit(EXIT_FAILURE);
   }
 
   pthread_t thread_id_server, thread_id_server_send;
