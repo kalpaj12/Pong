@@ -13,6 +13,8 @@ The year 2020 happened, and I was stuck at home due to lockdown.. I had projects
 
     sudo apt-get install libsdl2-dev libsdl2-mixer-dev libsdl2-net-dev libsdl2-ttf-dev cmake
 
+    git pull && git submodule update --init --recursive && git submodule foreach git pull origin master
+
     cd pong_client && ./build.sh
 
 ## What works
