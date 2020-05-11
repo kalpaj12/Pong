@@ -22,6 +22,7 @@ typedef struct player {
   int paddle_y_pos;
   int ball_x_pos;
   int ball_y_pos;
+  int opponent_id;
   struct sockaddr_in address;
 } player;
 
@@ -44,15 +45,17 @@ void getServerIP() {
          inet_ntoa(((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr), PORT);
 }
 
-void* listen_loop(void* arg) {
+void* listen(void* arg) {
   int sock_server = *((int*)arg);
   struct sockaddr_in client_addr;
   int16_t rdata[4];
 
   while (true) {
-    recvfrom(sock_server, rdata, sizeof(int16_t) * 4, 0,
-             (struct sockaddr*)&client_addr, &addr_size);
+    int bytes = recvfrom(sock_server, rdata, sizeof(int16_t) * 4, 0,
+                         (struct sockaddr*)&client_addr, &addr_size);
+    if (bytes <= 0) continue;
 
+    printf("From IP: %s\n", inet_ntoa(client_addr.sin_addr));
     printf("Received Datagram: ");
     for (int i = 0; i < 4; i++) printf("%d ", rdata[i]);
     printf("\n");
@@ -91,11 +94,6 @@ void* listen_loop(void* arg) {
   }
 }
 
-// void* send_loop(void* arg) {
-// int sock_server = *((int *)arg);
-// send ball pos, and paddle pos
-// }
-
 int main(void) {
   // Server init
   struct sockaddr_in server_addr;
@@ -117,17 +115,20 @@ int main(void) {
     perror("bind server error");
     exit(EXIT_FAILURE);
   }
+  // set recvfrom as non-blocking
+  if (fcntl(sock_server, F_SETFL, O_NONBLOCK, 1) == -1) {
+    perror("failed to set non-blocking\n");
+    exit(EXIT_FAILURE);
+  }
 
   getServerIP();
 
   // no connected players
   connected_players = -1;
 
-  pthread_t thread_id_server, thread_id_server_send;
+  pthread_t thread_id_server;
 
-  pthread_create(&thread_id_server, NULL, listen_loop, &sock_server);
-  // pthread_create(&thread_id_server_send, NULL, send_loop,
-  // &sock_server);
+  pthread_create(&thread_id_server, NULL, listen, &sock_server);
 
   printf("Use Enter key to close server\n");
   char c;
@@ -137,7 +138,6 @@ int main(void) {
 
   close(sock_server);
   pthread_cancel(thread_id_server);
-  // pthread_cancel(thread_id_server_send);
 
   return 0;
 }
