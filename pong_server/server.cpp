@@ -19,7 +19,9 @@
 const uint16_t PORT = 8080;
 
 typedef struct player {
-  int y_pos;
+  int paddle_y_pos;
+  int ball_x_pos;
+  int ball_y_pos;
   struct sockaddr_in address;
 } player;
 
@@ -51,32 +53,40 @@ void* listen_loop(void* arg) {
     recvfrom(sock_server, rdata, sizeof(int16_t) * 4, 0,
              (struct sockaddr*)&client_addr, &addr_size);
 
-    // // Debug start
-    // for (int i = 0; i < 4; i++) printf("%d ", rdata[i]);
-    // printf("\n");
-    // // Debug end
-
-    // @ TODO: implement communication structure
+    printf("Received Datagram: ");
+    for (int i = 0; i < 4; i++) printf("%d ", rdata[i]);
+    printf("\n");
 
     // requst to join server
     if (rdata[0] == -1) {
       if (connected_players + 1 < MAX_PLAYERS) {
-        printf("New Player connected\n");
-        connected_players++;
+        printf("New Player successfully connected\n");
 
-        players[connected_players].y_pos = 0;
-        players[connected_players].address = client_addr;
+        connected_players++;
+        int player_id = connected_players;
+
+        players[player_id].paddle_y_pos = rdata[1];
+        players[player_id].ball_x_pos = rdata[2];
+        players[player_id].ball_y_pos = rdata[3];
+        players[player_id].address = client_addr;
 
         int16_t sdata[4];
         for (int i = 0; i < 4; i++) sdata[i] = 0;
-        sdata[0] = 1;
+        sdata[0] = player_id;
         sendto(sock_server, sdata, sizeof(int16_t) * 4, 0,
                (struct sockaddr*)&client_addr, addr_size);
+
+        //  @ TODO: queue this player for matchmaking
       } else {
         printf("Server has reached MAX_PLAYERS limit\n");
-        // @ TODO: reject connection
+        int16_t sdata[4];
+        for (int i = 0; i < 4; i++) sdata[i] = 0;
+        sdata[0] = -2;
+        sendto(sock_server, sdata, sizeof(int16_t) * 4, 0,
+               (struct sockaddr*)&client_addr, addr_size);
       }
     } else {
+      // This data is related to matchmaking
     }
   }
 }

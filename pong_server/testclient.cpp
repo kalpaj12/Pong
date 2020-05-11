@@ -20,7 +20,7 @@ int main() {
   address.sin_family = AF_INET;
   address.sin_addr.s_addr = inet_addr("127.0.0.1");
   address.sin_port = htons(8080);
-  int16_t sdata[4] = {-1, 0, 1, 1};
+  int16_t sdata[4] = {-1, 0, 0, 0};
   int16_t rdata[4];
   // char buf[25], buf1[25];
   // printf("enter buf\n");
