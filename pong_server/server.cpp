@@ -16,11 +16,19 @@
 
 #define MAX_PLAYERS 2
 
-socklen_t addr_size = sizeof(struct sockaddr_in);
-struct sockaddr_in clients_addresses[MAX_PLAYERS];
-int players[MAX_PLAYERS];
+const uint16_t PORT = 8080;
 
-void getLocalIP() {
+typedef struct player {
+  int y_pos;
+  struct sockaddr_in address;
+} player;
+
+player players[MAX_PLAYERS];
+volatile int connected_players;
+
+socklen_t addr_size = sizeof(struct sockaddr_in);
+
+void getServerIP() {
   int fd = socket(AF_INET, SOCK_DGRAM, 0);
   struct ifreq ifr;
   ifr.ifr_addr.sa_family = AF_INET;
@@ -30,15 +38,11 @@ void getLocalIP() {
 
   close(fd);
 
-  printf("Server IP: [%s]\n",
-         inet_ntoa(((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr));
+  printf("Server Listening on: [%s::%d]\n",
+         inet_ntoa(((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr), PORT);
 }
 
-void init_players() {
-  for (int i = 0; i < MAX_PLAYERS; i++) players[i] = 0;
-}
-
-void* server_listen_loop(void* arg) {
+void* listen_loop(void* arg) {
   int sock_server = *((int*)arg);
   struct sockaddr_in client_addr;
   int16_t rdata[4];
@@ -47,48 +51,50 @@ void* server_listen_loop(void* arg) {
     recvfrom(sock_server, rdata, sizeof(int16_t) * 4, 0,
              (struct sockaddr*)&client_addr, &addr_size);
 
-    // Debug start
-    for (int i = 0; i < 4; i++) printf("%d ", rdata[i]);
-    printf("\n");
-    // Debug end
+    // // Debug start
+    // for (int i = 0; i < 4; i++) printf("%d ", rdata[i]);
+    // printf("\n");
+    // // Debug end
+
+    // @ TODO: implement communication structure
 
     // requst to join server
     if (rdata[0] == -1) {
-      // @TODO:
-      // check if connected player (client_addr) exceed max_player;
-      // check if current connection is a re-connection
-      int16_t sdata[4];
-      for (int i = 0; i < 4; i++) sdata[i] = 0;
-      sdata[0] = 1;
-      sendto(sock_server, sdata, sizeof(int16_t) * 4, 0,
-             (struct sockaddr*)&client_addr, addr_size);
-      // Save to list of connected players
+      if (connected_players + 1 < MAX_PLAYERS) {
+        printf("New Player connected\n");
+        connected_players++;
+
+        players[connected_players].y_pos = 0;
+        players[connected_players].address = client_addr;
+
+        int16_t sdata[4];
+        for (int i = 0; i < 4; i++) sdata[i] = 0;
+        sdata[0] = 1;
+        sendto(sock_server, sdata, sizeof(int16_t) * 4, 0,
+               (struct sockaddr*)&client_addr, addr_size);
+      } else {
+        printf("Server has reached MAX_PLAYERS limit\n");
+        // @ TODO: reject connection
+      }
+    } else {
     }
   }
 }
 
-// void* server_send_loop(void* arg) {
+// void* send_loop(void* arg) {
 // int sock_server = *((int *)arg);
 // send ball pos, and paddle pos
 // }
 
 int main(void) {
-  printf("Server Init Successful!\n");
-  getLocalIP();
-
-  init_players();
-
-  // char* server_ip_addr = NULL;
-  const uint16_t PORT = 8080;
-
+  // Server init
   struct sockaddr_in server_addr;
 
   memset(&server_addr, 0, sizeof(server_addr));
+
   server_addr.sin_family = AF_INET;
   server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
   server_addr.sin_port = htons(PORT);
-
-  memset(clients_addresses, 0, sizeof(struct sockaddr_in) * MAX_PLAYERS);
 
   // Create a UDP socket
   int sock_server;
@@ -102,15 +108,21 @@ int main(void) {
     exit(EXIT_FAILURE);
   }
 
+  getServerIP();
+
+  // no connected players
+  connected_players = -1;
+
   pthread_t thread_id_server, thread_id_server_send;
 
-  pthread_create(&thread_id_server, NULL, server_listen_loop, &sock_server);
-  // pthread_create(&thread_id_server_send, NULL, server_send_loop,
+  pthread_create(&thread_id_server, NULL, listen_loop, &sock_server);
+  // pthread_create(&thread_id_server_send, NULL, send_loop,
   // &sock_server);
 
   printf("Use Enter key to close server\n");
   char c;
   while ((c = getchar()) != '\n') {
+    // Server remains active
   }
 
   close(sock_server);
