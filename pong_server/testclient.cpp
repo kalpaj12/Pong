@@ -22,17 +22,18 @@ int main() {
   address.sin_port = htons(8080);
   int16_t sdata[4] = {-1, 0, 0, 0};
   int16_t rdata[4];
-  // char buf[25], buf1[25];
-  // printf("enter buf\n");
-  // gets(buf);
+
   socklen_t len = sizeof(address);
   int m = sendto(sd, sdata, sizeof(int16_t) * 4, 0, (struct sockaddr *)&address,
                  len);
-  int n = recvfrom(sd, rdata, sizeof(int16_t) * 4, 0,
-                   (struct sockaddr *)&address, &len);
-  printf("the server echo is\n");
-  for (int i = 0; i < 4; i++) printf("%d ", rdata[i]);
-  // puts(buf);
+  while (1) {
+    int n = recvfrom(sd, rdata, sizeof(int16_t) * 4, 0,
+                     (struct sockaddr *)&address, &len);
+    printf("[%d] the server echo is:\n", n);
+    for (int i = 0; i < 4; i++) printf("%d ", rdata[i]);
+    printf("\n");
+  }
+
   close(sd);
   return 0;
 }

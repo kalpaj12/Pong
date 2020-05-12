@@ -14,6 +14,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <queue>
+
 #define MAX_PLAYERS 2
 
 const uint16_t PORT = 8080;
@@ -28,6 +30,7 @@ typedef struct player {
 
 player players[MAX_PLAYERS];
 volatile int connected_players;
+std::queue<int> ready;
 
 socklen_t addr_size = sizeof(struct sockaddr_in);
 
@@ -43,6 +46,30 @@ void getServerIP() {
 
   printf("Server Listening on: [%s::%d]\n",
          inet_ntoa(((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr), PORT);
+}
+
+void matchmaking(int16_t rdata[], int sock_server) {
+  if (ready.size() >= 2) {
+    int player_1 = ready.front();
+    ready.pop();
+    int player_2 = ready.front();
+    ready.pop();
+
+    players[player_1].opponent_id = player_2;
+    players[player_2].opponent_id = player_1;
+
+    int16_t sdata1[4], sdata2[4];
+    for (int i = 0; i < 4; i++) sdata1[i] = sdata2[i] = 0;
+
+    sdata1[0] = player_2;
+    sdata2[0] = player_1;
+
+    sendto(sock_server, sdata1, sizeof(int16_t) * 4, 0,
+           (struct sockaddr*)&players[player_1].address, addr_size);
+
+    sendto(sock_server, sdata2, sizeof(int16_t) * 4, 0,
+           (struct sockaddr*)&players[player_2].address, addr_size);
+  }
 }
 
 void* listen(void* arg) {
@@ -79,7 +106,9 @@ void* listen(void* arg) {
         sendto(sock_server, sdata, sizeof(int16_t) * 4, 0,
                (struct sockaddr*)&client_addr, addr_size);
 
-        //  @ TODO: queue this player for matchmaking
+        ready.push(player_id);
+        matchmaking(rdata, sock_server);
+
       } else {
         printf("Server has reached MAX_PLAYERS limit\n");
         int16_t sdata[4];
@@ -89,7 +118,20 @@ void* listen(void* arg) {
                (struct sockaddr*)&client_addr, addr_size);
       }
     } else {
-      // This data is related to matchmaking
+      players[rdata[0]].paddle_y_pos = rdata[1];
+      players[rdata[0]].ball_x_pos = rdata[2];
+      players[rdata[0]].ball_y_pos = rdata[3];
+
+      int16_t sdata[4];
+      for (int i = 0; i < 4; i++) sdata[i] = 0;
+
+      sdata[0] = players[rdata[0]].opponent_id;
+      sdata[1] = players[sdata[0]].paddle_y_pos;
+      sdata[2] = players[sdata[0]].ball_x_pos;
+      sdata[3] = players[sdata[0]].ball_y_pos;
+
+      sendto(sock_server, sdata, sizeof(int16_t) * 4, 0,
+             (struct sockaddr*)&client_addr, addr_size);
     }
   }
 }
