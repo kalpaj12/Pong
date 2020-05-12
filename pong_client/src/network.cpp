@@ -1,6 +1,8 @@
 #include "network.hpp"
 
 Network::Network() {
+  ball_handler = false;
+
   sock = socket(AF_INET, SOCK_DGRAM, 0);
   serverAddress.sin_family = AF_INET;
   serverAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -29,6 +31,11 @@ Network::Network() {
   for (int i = 0; i < 4; i++) printf("%d ", rdata[i]);
   printf("\n");
   opponent_player_id = rdata[0];
+
+  if (rdata[1] == 1) {
+    std::cout << "You are the Ball Handler" << std::endl;
+    ball_handler = true;
+  }
 }
 
 Network::~Network() { close(sock); }

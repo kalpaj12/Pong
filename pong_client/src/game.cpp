@@ -76,14 +76,15 @@ void Game::initializeGame() {
       exit(EXIT_FAILURE);
     }
 
+    Game::status = Game::START;
+
     Game::mode = Game::AI;
 #ifdef MULTIPLAYER
     Game::mode = Game::MULTIP;
     std::cout << "Multiplayer enabled!" << std::endl;
     this->_conn = new Network();
+    Game::status = Game::INPLAY;
 #endif
-
-    Game::status = Game::START;
 
     // All loaded successfully, play init sound
     // Yes, it is of SuperMario Bros.
@@ -203,8 +204,10 @@ void Game::update() {
       int16_t data[4];
       data[0] = this->_conn->my_player_id;
       data[1] = this->_mouse_y;
-      data[2] = this->_ball->x_pos;
-      data[3] = this->_ball->y_pos;
+      if (this->_conn->ball_handler) {
+        data[2] = this->_ball->x_pos;
+        data[3] = this->_ball->y_pos;
+      }
 
       this->_conn->setrdata(data);
       this->_conn->sendServer();
@@ -224,10 +227,15 @@ void Game::update() {
     }
 
     // Update ball pos
-    this->_ball->bounced = false;
-    this->_ball->x_pos += this->_ball->dx;
-    this->_ball->y_pos += this->_ball->dy;
-
+    if (this->_conn->ball_handler) {
+      this->_ball->bounced = false;
+      this->_ball->x_pos += this->_ball->dx;
+      this->_ball->y_pos += this->_ball->dy;
+    } else {
+      this->_ball->bounced = false;
+      this->_ball->x_pos = this->_conn->rdata[2];
+      this->_ball->y_pos = this->_conn->rdata[3];
+    }
     // Ball collides to upper walls
     if (this->_ball->latitude_wall_collision()) {
       this->_ball->dy *= (-1);
@@ -265,12 +273,16 @@ void Game::update() {
     Game::status = Game::COMPLETE;
     this->_text_winner = renderText("Player 2 wins!", this->_font_color,
                                     this->_font_size, sdlRenderer);
+    this->_conn->~Network();
+    this->~Game();
   }
 
   if (this->_left_score == 5) {
     Game::status = Game::COMPLETE;
     this->_text_winner = renderText("Player 1 wins!", this->_font_color,
                                     this->_font_size, sdlRenderer);
+    this->_conn->~Network();
+    this->~Game();
   }
 }
 

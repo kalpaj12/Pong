@@ -62,6 +62,9 @@ void matchmaking(int16_t rdata[], int sock_server) {
     for (int i = 0; i < 4; i++) sdata1[i] = sdata2[i] = 0;
 
     sdata1[0] = player_2;
+    // player_1 takes care of the ball
+    sdata1[1] = 1;
+
     sdata2[0] = player_1;
 
     sendto(sock_server, sdata1, sizeof(int16_t) * 4, 0,

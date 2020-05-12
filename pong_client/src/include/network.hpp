@@ -14,6 +14,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <iostream>
+
 class Network {
  public:
   Network();
@@ -33,4 +35,6 @@ class Network {
 
   int16_t sdata[4] = {-1, 0, 0, 0};
   int16_t rdata[4];
+
+  bool ball_handler;
 };

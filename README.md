@@ -11,7 +11,7 @@ The year 2020 happened, and I was stuck at home due to lockdown.. I had projects
 
 ## Steps to run:
 
-    sudo apt-get install libsdl2-dev libsdl2-mixer-dev libsdl2-net-dev libsdl2-ttf-dev cmake
+    sudo apt-get install libsdl2-dev libsdl2-mixer-dev libsdl2-net-dev libsdl2-ttf-dev libsdl2-image-dev cmake
 
     git clone https://github.com/kalpaj12/Pong
 
