@@ -205,7 +205,8 @@ void Game::update() {
       data[0] = this->_conn->my_player_id;
       data[1] = this->_mouse_y;
       if (this->_conn->ball_handler) {
-        data[2] = this->_ball->x_pos;
+        data[2] =
+            Game::SCREEN_WIDTH - this->_ball->x_pos - this->_ball->DIMENSION;
         data[3] = this->_ball->y_pos;
       }
 
