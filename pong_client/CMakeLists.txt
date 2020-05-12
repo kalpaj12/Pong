@@ -23,6 +23,12 @@ find_package(Threads REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -Wextra -Wshadow -Wfatal-errors -Wnon-virtual-dtor -Wunused -Wpedantic -Warray-bounds")
 
 add_executable(pong ${SOURCES} main.cpp)
+
+if( MULTIPLAYER )
+	message("GAME MODE: MULTIPLAYER")
+	add_definitions(-DMULTIPLAYER)
+endif ()
+
 target_link_libraries(pong ${CMAKE_THREAD_LIBS_INIT})
 
 target_link_libraries(pong SDL2::Main SDL2::Mixer SDL2::Image SDL2::TTF SDL2::Net)

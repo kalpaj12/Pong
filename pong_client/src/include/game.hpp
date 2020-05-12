@@ -84,6 +84,9 @@ class Game {
   enum Status { START, INPLAY, PAUSE, COMPLETE };
   Status status;
 
+  enum Mode { AI, MULTIP };
+  Mode mode;
+
   // Renderer related methods
   SDL_Texture* renderText(const std::string& message, SDL_Color color,
                           int fontSize, SDL_Renderer* renderer);
