@@ -194,8 +194,15 @@ void Game::update() {
     // Paddles
     this->_right_paddle->set_y(this->_mouse_y);
 
-    // @TODO: Add AI here
-    this->_left_paddle->set_y(this->_mouse_y);
+    // @TODO: if game mode is self, do
+    // this->_left_paddle->set_y(this->_mouse_y);
+
+    // If game mode is AI
+    //  AI trackes Ball, puff, not really AI
+    this->_left_paddle->set_ai_y(this->_ball);
+
+    // @TODO: If game mode is Multiplayer:
+    // Get right_paddle_pos from server.
 
     // Update ball pos
     this->_ball->bounced = false;

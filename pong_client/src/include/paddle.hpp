@@ -1,5 +1,9 @@
 #pragma once
 
+#include "ball.hpp"
+
+class Ball;
+
 class Paddle {
  public:
   static const int HEIGHT = 60;
@@ -13,4 +17,5 @@ class Paddle {
 
   // As paddle moves only in y-direction
   void set_y(int new_y);
+  void set_ai_y(Ball *ball);
 };
