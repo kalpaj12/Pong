@@ -95,6 +95,7 @@ void* listen(void* arg) {
         connected_players++;
         int player_id = connected_players;
 
+        players[player_id].opponent_id = -1;
         players[player_id].paddle_y_pos = rdata[1];
         players[player_id].ball_x_pos = rdata[2];
         players[player_id].ball_y_pos = rdata[3];
@@ -118,20 +119,22 @@ void* listen(void* arg) {
                (struct sockaddr*)&client_addr, addr_size);
       }
     } else {
-      players[rdata[0]].paddle_y_pos = rdata[1];
-      players[rdata[0]].ball_x_pos = rdata[2];
-      players[rdata[0]].ball_y_pos = rdata[3];
+      if (players[rdata[0]].opponent_id != -1) {
+        players[rdata[0]].paddle_y_pos = rdata[1];
+        players[rdata[0]].ball_x_pos = rdata[2];
+        players[rdata[0]].ball_y_pos = rdata[3];
 
-      int16_t sdata[4];
-      for (int i = 0; i < 4; i++) sdata[i] = 0;
+        int16_t sdata[4];
+        for (int i = 0; i < 4; i++) sdata[i] = 0;
 
-      sdata[0] = players[rdata[0]].opponent_id;
-      sdata[1] = players[sdata[0]].paddle_y_pos;
-      sdata[2] = players[sdata[0]].ball_x_pos;
-      sdata[3] = players[sdata[0]].ball_y_pos;
+        sdata[0] = players[rdata[0]].opponent_id;
+        sdata[1] = players[sdata[0]].paddle_y_pos;
+        sdata[2] = players[sdata[0]].ball_x_pos;
+        sdata[3] = players[sdata[0]].ball_y_pos;
 
-      sendto(sock_server, sdata, sizeof(int16_t) * 4, 0,
-             (struct sockaddr*)&client_addr, addr_size);
+        sendto(sock_server, sdata, sizeof(int16_t) * 4, 0,
+               (struct sockaddr*)&client_addr, addr_size);
+      }
     }
   }
 }
