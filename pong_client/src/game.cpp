@@ -199,6 +199,17 @@ void Game::update() {
   }
 
   if (Game::status == Game::INPLAY) {
+    if (Game::mode == Game::MULTIP) {
+      int16_t data[4];
+      data[0] = this->_conn->my_player_id;
+      data[1] = this->_mouse_y;
+      data[2] = this->_ball->x_pos;
+      data[3] = this->_ball->y_pos;
+
+      this->_conn->setrdata(data);
+      this->_conn->sendServer();
+      this->_conn->recServer();
+    }
     // Paddles
     this->_right_paddle->set_y(this->_mouse_y);
 
