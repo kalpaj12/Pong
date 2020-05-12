@@ -8,10 +8,12 @@
 #include <string>
 
 #include "ball.hpp"
+#include "network.hpp"
 #include "paddle.hpp"
 
 class Ball;
 class Paddle;
+class Network;
 
 class Game {
  private:
@@ -52,6 +54,8 @@ class Game {
 
   // Game loop
   bool _isRunning;
+
+  Network* _conn;
 
  public:
   static SDL_Renderer* sdlRenderer;

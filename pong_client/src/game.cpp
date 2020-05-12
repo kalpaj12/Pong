@@ -46,12 +46,6 @@ void Game::initializeGameWindow(const char* title, int window_xpos,
 
 void Game::initializeGame() {
   if (Game::status != Game::INPLAY) {
-    Game::mode = Game::AI;
-#ifdef MULTIPLAYER
-    Game::mode = Game::MULTIP;
-    std::cout << "Multiplayer enabled!" << std::endl;
-#endif
-
     // Initialise sound system
     Mix_OpenAudio(22050, MIX_DEFAULT_FORMAT, 2, 1024);
 
@@ -81,6 +75,14 @@ void Game::initializeGame() {
 
       exit(EXIT_FAILURE);
     }
+
+    Game::mode = Game::AI;
+#ifdef MULTIPLAYER
+    Game::mode = Game::MULTIP;
+    std::cout << "Multiplayer enabled!" << std::endl;
+    this->_conn = new Network();
+#endif
+
     Game::status = Game::START;
 
     // All loaded successfully, play init sound
@@ -205,8 +207,10 @@ void Game::update() {
       this->_left_paddle->set_ai_y(this->_ball);
     }
 
-    // @TODO: If game mode is Multiplayer:
-    // Get right_paddle_pos from server.
+    if (Game::mode == Game::MULTIP) {
+      this->_left_paddle->set_y(this->_conn->rdata[1]);
+      // @ TODO: set ball position
+    }
 
     // Update ball pos
     this->_ball->bounced = false;
