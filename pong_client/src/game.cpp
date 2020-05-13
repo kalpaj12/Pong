@@ -228,7 +228,7 @@ void Game::update() {
     }
 
     // Update ball pos
-    if (this->_conn->ball_handler) {
+    if (Game::mode == Game::AI || this->_conn->ball_handler) {
       this->_ball->bounced = false;
       this->_ball->x_pos += this->_ball->dx;
       this->_ball->y_pos += this->_ball->dy;

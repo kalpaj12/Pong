@@ -32,6 +32,8 @@ player players[MAX_PLAYERS];
 volatile int connected_players;
 std::queue<int> ready;
 
+int packets_recieved = 0;
+
 socklen_t addr_size = sizeof(struct sockaddr_in);
 
 void getServerIP() {
@@ -85,6 +87,8 @@ void* listen(void* arg) {
                          (struct sockaddr*)&client_addr, &addr_size);
     if (bytes <= 0) continue;
 
+    packets_recieved++;
+    printf("%d\n", packets_recieved);
     printf("From IP: %s\n", inet_ntoa(client_addr.sin_addr));
     printf("Received Datagram: ");
     for (int i = 0; i < 4; i++) printf("%d ", rdata[i]);

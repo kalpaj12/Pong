@@ -53,8 +53,8 @@ void Ball::init_ball_push() {
   std::uniform_int_distribution<int> iangle(-60, 60);
   this->angle = iangle(rgen);  // -60 to 60 degrees
 
-  this->dx = launch_direction * 2 * std::cos(this->angle * M_PI / 180.0);
-  this->dy = launch_direction * 2 * std::sin(this->angle * M_PI / 180.0);
+  this->dx = launch_direction * 4 * std::cos(this->angle * M_PI / 180.0);
+  this->dy = launch_direction * 4 * std::sin(this->angle * M_PI / 180.0);
 }
 
 void Ball::reset() {
