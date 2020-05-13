@@ -274,16 +274,20 @@ void Game::update() {
     Game::status = Game::COMPLETE;
     this->_text_winner = renderText("Player 2 wins!", this->_font_color,
                                     this->_font_size, sdlRenderer);
-    this->_conn->~Network();
-    this->~Game();
+    if (Game::mode == Game::MULTIP) {
+      this->_conn->~Network();
+      this->~Game();
+    }
   }
 
   if (this->_left_score == 5) {
     Game::status = Game::COMPLETE;
     this->_text_winner = renderText("Player 1 wins!", this->_font_color,
                                     this->_font_size, sdlRenderer);
-    this->_conn->~Network();
-    this->~Game();
+    if (Game::mode == Game::MULTIP) {
+      this->_conn->~Network();
+      this->~Game();
+    }
   }
 }
 
