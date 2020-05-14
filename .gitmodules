@@ -1,3 +1,0 @@
-[submodule "pong_client/cmake"]
-	path = pong_client/cmake
-	url = https://github.com/aminosbh/sdl2-cmake-modules
