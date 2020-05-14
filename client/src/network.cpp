@@ -5,7 +5,12 @@ Network::Network() {
 
   sock = socket(AF_INET, SOCK_DGRAM, 0);
   serverAddress.sin_family = AF_INET;
-  serverAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
+  std::string server_address;
+
+  std::cout << "Enter Server IP:" << std::endl;
+  std::cin >> server_address;
+
+  serverAddress.sin_addr.s_addr = inet_addr(server_address.c_str());
   serverAddress.sin_port = htons(8080);
 
   // Ready to connect

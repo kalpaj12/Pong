@@ -19,7 +19,7 @@ The year 2020 happened, and I was stuck at home due to lockdown.. I had projects
 
     git submodule update --init --recursive && git submodule foreach git pull origin master
 
-    cd pong_client && ./build.sh
+    cd client && ./build.sh
 
 ## What works
 * Yes, Multiplayer functionality works!
