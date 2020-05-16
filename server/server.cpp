@@ -16,9 +16,9 @@
 
 #include <queue>
 
-#define MAX_PLAYERS 2
+#define MAX_PLAYERS 10
 
-const uint16_t PORT = 8080;
+const uint16_t PORT = 1337;
 
 typedef struct player {
   int paddle_y_pos;

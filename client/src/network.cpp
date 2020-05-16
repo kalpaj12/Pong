@@ -11,7 +11,7 @@ Network::Network() {
   std::cin >> server_address;
 
   serverAddress.sin_addr.s_addr = inet_addr(server_address.c_str());
-  serverAddress.sin_port = htons(8080);
+  serverAddress.sin_port = htons(1337);
 
   // Ready to connect
   sendServer();

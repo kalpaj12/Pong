@@ -224,7 +224,6 @@ void Game::update() {
 
     if (Game::mode == Game::MULTIP) {
       this->_left_paddle->set_y(this->_conn->rdata[1]);
-      // @ TODO: set ball position
     }
 
     // Update ball pos
