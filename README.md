@@ -25,4 +25,4 @@ The year 2020 happened, and I was stuck at home due to lockdown.. I had projects
 * Yes, Multiplayer functionality works!
 
 
-Note: If you have firewall enabled, allow/add rule: 8080/udp
+Note: If you have firewall enabled, allow/add rule: 1337/udp
